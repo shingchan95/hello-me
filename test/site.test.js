@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
 import { readFile } from 'node:fs/promises';
 import { after, before, test } from 'node:test';
 import { createSiteServer } from '../scripts/server.js';
@@ -49,4 +51,37 @@ test('build produces the complete homepage for static hosting', async () => {
   const source = await readFile(new URL('../index.html', import.meta.url), 'utf8');
   const built = await readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
   assert.equal(built, source);
+});
+
+test('the start entry point launches and serves the homepage', { timeout: 10000 }, async (t) => {
+  const child = spawn(process.execPath, ['scripts/server.js'], {
+    cwd: new URL('../', import.meta.url),
+    env: { ...process.env, PORT: '0' },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const exited = once(child, 'exit');
+  t.after(async () => {
+    child.kill();
+    await exited;
+  });
+
+  let errors = '';
+  child.stderr.setEncoding('utf8');
+  child.stderr.on('data', (chunk) => { errors += chunk; });
+  const address = await new Promise((resolve, reject) => {
+    let output = '';
+    child.stdout.setEncoding('utf8');
+    child.stdout.on('data', (chunk) => {
+      output += chunk;
+      const match = output.match(/http:\/\/localhost:(\d+)/);
+      if (match) resolve(`http://127.0.0.1:${match[1]}`);
+    });
+    child.once('error', reject);
+    child.once('exit', (code) => reject(new Error(`Server exited with code ${code}: ${errors}`)));
+  });
+
+  const response = await fetch(address, { signal: AbortSignal.timeout(5000) });
+  assert.equal(response.status, 200);
+  assert.match(await response.text(), /<h1>Hello, world!<\/h1>/);
+  assert.equal(errors, '');
 });
