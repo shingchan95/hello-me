@@ -1,5 +1,41 @@
 # Issue #14 / PR #15 verification
 
+## Current disposition — 2026-09-14 19:52 UTC
+
+**Acceptance remains blocked on trusted Project verification.** Passing repository
+checks does not establish work-item completion. This section supersedes workflow
+status statements in the historical records below.
+
+Read-only GitHub queries were repeated for Issue #14, PR #15, Actions run
+`34876131072`, and deployment `6442018738` and its statuses:
+
+| Required evidence | Current observation | Disposition |
+| --- | --- | --- |
+| Active approved Issue in Project | GitHub Issue #14 is OPEN; `projectItems` is empty. No trusted Project interface is available in this session. | Unverified; the Project owner must confirm the active item and its approved scope. |
+| Implementation assignment | Issue `assignees` is empty. Sarah is a role named in the requirements. | Unverified; the Project owner must resolve the actual account and record the assignment. |
+| PR linkage and automated QA | PR #15 is OPEN, targets main, closes #14, and has head `ec33c067aed87b42b4d10b2cf6daff1a0fab7936`. Its hosted build, tests, and Chromium check passed. | Verified for that SHA only. |
+| Independent QA and Project QA status | PR reviews are empty and `reviewDecision` is empty; Project QA status is unavailable. | Unverified; route the PR to the intended Thomas account and record the independent outcome in Project. |
+| Deployment of the approved work | The successful Pages deployment references `afb7c229ca810e2f1a5fc9cfcfcffe5e8a18cc82`, before the quiz. | Unverified for Issue #14; after the required review and release process, record a successful deployment of the approved commit. |
+
+The [hosted QA run](https://github.com/shingchan95/hello-me/actions/runs/34876131072)
+completed successfully at 17:41:06 UTC, including `npm run test:browser`.
+This resolves the earlier statement that the browser CI step had not run, but
+does not supply independent approval or deployment evidence.
+
+No local code change can supply the missing trusted Project records. Keep the
+work item pending until the responsible workflow owner records the evidence
+above. Do not infer identities from role names or equate a GitHub OPEN Issue
+with an active Project assignment. This repair preserves the existing quiz,
+read-only CI permissions, and external workflow state.
+
+Local revalidation for this documentation repair: `npm test` passed all 10
+tests and the build; `git diff --check` passed. The browser command initially
+failed because `/usr/bin/chromium` was absent in this checkout. After installing
+system Chromium with `apk add --no-cache chromium`,
+`CHROMIUM_PATH=/usr/bin/chromium npm run test:browser` passed. No repository
+dependency or application changes were needed. Hosted QA for this new repair
+commit remains pending until it runs after push.
+
 ## Repair validation — 2026-09-14
 
 This section supersedes the pending automated browser and hosted-check statements
