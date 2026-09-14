@@ -1,5 +1,33 @@
 # Issue #14 / PR #15 verification
 
+## Follow-up repair — 2026-09-14 19:55 UTC
+
+**The QA finding remains unresolved externally.** The requirements record now
+correctly labels the Issue scope as planned, removing the unsupported claim
+that this is an assigned work item. The live Issue itself explicitly states
+that active Issue status and assignment cannot yet be confirmed.
+
+Fresh read-only queries found Issue #14 OPEN with empty `assignees` and
+`projectItems`, and PR #15 OPEN with no reviews, closing #14. The PR head was
+`7b9bbdfba9e7171ca599c00e357158bdd4aa3edf`; its
+[QA run](https://github.com/shingchan95/hello-me/actions/runs/34889750688)
+was in progress when queried. Deployment `6442018738` has a successful status,
+but references pre-quiz commit `afb7c229ca810e2f1a5fc9cfcfcffe5e8a18cc82`.
+These observations supersede the previous remote-head/check observations below.
+
+To resolve acceptance, the workflow owner must supply the authoritative Project
+item URL or ID and accessible records showing approved scope, active status,
+the actual implementation assignee, independent QA outcome linked to the
+reviewed PR commit, and successful deployment of the approved work. Role names
+alone do not identify assignee/reviewer accounts. No trusted Project tool or
+record is available in this checkout, so these facts cannot be supplied by a
+repository edit. Repeating local tests cannot resolve this finding.
+
+Revalidated the preserved implementation: `npm test` passed the build and all
+10 tests; `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser` passed.
+`git diff --check` passed after the documentation correction. Application code
+and CI permissions are unchanged. No external workflow transitions were made.
+
 ## Current disposition — 2026-09-14 19:52 UTC
 
 **Acceptance remains blocked on trusted Project verification.** Passing repository

@@ -2,12 +2,18 @@
 
 ## Requirements source
 
-This record captures the scope explicitly supplied in the current assigned work
-item, identified by the requester as GitHub Issue #14. It addresses the previous
-CHANGES_REQUIRED feedback asking for approved requirements and a mapping to the
-implementation. It is not independent verification of GitHub or Project state.
+This record maps the planned scope in GitHub Issue #14 to the existing
+implementation. It does not establish an approved or assigned work item.
+Read-only verification of the Issue on 2026-09-14 confirmed that its body says:
 
-The supplied requirements are:
+> I can’t confirm an active Issue or assignment yet—the trusted Project state still shows none.
+
+The Issue introduces the list below as “The planned work is”. Earlier wording
+in this record calling it the “current assigned work item” was unsupported.
+Approval, assignment, and completion remain unverified pending trusted Project
+evidence; this implementation map does not resolve that acceptance blocker.
+
+The planned requirements are:
 
 > - Add a responsive, keyboard-accessible “Get to Know Me” quiz
 > - Show an on-page personalised result
