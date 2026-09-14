@@ -10,8 +10,24 @@ try {
   const requests = [];
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push(message.text());
+  });
   page.on('request', request => requests.push(request.url()));
-  await page.goto(`http://127.0.0.1:${server.address().port}`);
+  const response = await page.goto(`http://127.0.0.1:${server.address().port}`);
+  assert.equal(response.status(), 200, 'homepage must load successfully');
+  assert.equal(await page.title(), 'Hello, world!');
+  for (const viewport of [{width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
+    await page.setViewportSize(viewport);
+    const greeting = page.getByRole('heading', {name: 'Hello, world!', level: 1, exact: true});
+    assert.equal(await greeting.count(), 1);
+    assert.equal(await greeting.isVisible(), true);
+    const bounds = await greeting.boundingBox();
+    assert.ok(bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= viewport.width && bounds.y + bounds.height <= viewport.height,
+      `greeting must fit in the initial ${viewport.width}px viewport`);
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  }
+  await page.setViewportSize({width: 320, height: 640});
   await page.getByRole('button', {name: 'Show my result'}).click();
   assert.equal(await page.locator('#quiz-result').isVisible(), false);
   await page.locator('input').first().focus();
@@ -41,7 +57,7 @@ try {
   assert.equal(await noJS.getByRole('heading', {name: 'Hello, world!'}).isVisible(), true);
   assert.equal(await noJS.locator('noscript').isVisible(), true);
   assert.equal(await noJS.locator('#quiz-form').isVisible(), false);
-  console.log('PASS: browser keyboard flow, required validation, result focus, restart, 320/768/1440px layout, no answer requests/storage, and no-JavaScript fallback.');
+  console.log('PASS: homepage HTTP status, title and greeting in mobile/tablet/desktop viewports, browser keyboard flow, required validation, result focus, restart, 320/768/1440px layout, no runtime/console errors, no answer requests/storage, and no-JavaScript fallback.');
 } finally {
   await browser?.close();
   await new Promise(resolve => server.close(resolve));
