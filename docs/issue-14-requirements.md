@@ -37,6 +37,10 @@ and direct GitHub observations. Local validation does not establish Project
 assignment or independent QA approval.
 
 Run `npm test` (which includes `npm run build`) from the repository root.
+The committed `npm run test:browser` check additionally exercises native
+Chromium keyboard interaction, required fields, result/restart focus, horizontal
+overflow at 320/768/1440px, no requests or storage after answering, and the
+JavaScript-disabled fallback. See the README for browser installation.
 The automated suite covers script behavior and HTML structure; it does not
 replace browser checks for layout, native keyboard interaction, or screen-reader
 announcements. For browser QA, complete the quiz at narrow and wide widths using

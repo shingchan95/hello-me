@@ -1,5 +1,46 @@
 # Issue #14 / PR #15 verification
 
+## Repair validation — 2026-09-14
+
+This section supersedes the pending automated browser and hosted-check statements
+in the historical record below. The repair preserves the implementation at
+`76bb3adf30763019580e99652c349e387f14dcd7` and adds a reproducible Chromium
+check, a pinned development-only Playwright dependency and lockfile, and CI
+execution of that check. Repository permissions remain read-only in CI.
+
+Executed on Node.js v24.21.0 / npm 11.19.0:
+
+- `npm ci --include=dev`: passed, audit reported no vulnerabilities.
+- `npm test`: build and all 10 tests passed, zero failures or skips, including
+  actual HTTP server startup and all 27 result combinations.
+- `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser`: passed using Alpine
+  Chromium 152.0.7977.82. Verified native required-field blocking, ArrowRight,
+  Tab, Space and Enter interaction, result and restart focus, cleared answers,
+  no horizontal overflow at 320/768/1440px, no additional requests or local/session
+  storage or cookies, no page errors, and the JavaScript-disabled fallback.
+- `git diff --check`: passed.
+
+The initial bundled Chromium launch failed because this checkout runs Alpine;
+installing system Chromium and using the documented `CHROMIUM_PATH` resolved it.
+CI installs Playwright Chromium on Ubuntu. Its newly added browser step has not
+yet run on GitHub. Visual review and screen-reader announcements remain human
+QA checks; overflow assertions do not establish visual approval.
+
+Fresh read-only GitHub queries confirmed Issue #14 is OPEN with no assignees or
+Project items. PR #15 is OPEN, targets main, closes #14, and its remote head
+matched `76bb3adf30763019580e99652c349e387f14dcd7`. Reviews are empty. The existing
+[Build and runtime tests check](https://github.com/shingchan95/hello-me/actions/runs/34875800069/job/104082541679)
+completed successfully at 17:36:52 UTC for that commit; this is not a hosted
+result for the new repair commit.
+
+`gh api repos/shingchan95/hello-me/deployments` and the returned deployment's
+`statuses` endpoint show a successful GitHub Pages deployment at 16:52:19 UTC,
+but only for `afb7c229ca810e2f1a5fc9cfcfcffe5e8a18cc82` on main, before the quiz.
+This does not verify deployment of Issue #14. No trusted Project interface is
+available here to verify the active work item, Sarah/Thomas assignments, or QA
+status. Overall Issue completion remains unconfirmed. No assignment, approval,
+Issue closure, PR merge, or deployment was performed by this repair.
+
 ## Local validation — 2026-09-14
 
 Validated the existing implementation at commit
