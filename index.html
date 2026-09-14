@@ -37,12 +37,91 @@
         overflow-wrap: anywhere;
       }
       p { margin: 1rem 0 0; color: #52617a; line-height: 1.6; }
+      .quiz { margin-top: 2.5rem; border-top: 1px solid #dce3ef; padding-top: 1.5rem; text-align: left; }
+      h2 { font-size: 1.5rem; margin: 0; }
+      fieldset { min-width: 0; margin: 1.5rem 0; padding: 0; border: 0; }
+      legend { font-weight: 650; margin-bottom: .75rem; }
+      label { display: flex; align-items: center; gap: .75rem; min-height: 44px; padding: .75rem; margin-top: .5rem; border: 1px solid #dce3ef; border-radius: .75rem; cursor: pointer; }
+      label:hover { background: #f5f7fb; }
+      input { flex-shrink: 0; accent-color: #17233b; }
+      button { min-height: 44px; padding: .75rem 1rem; border: 1px solid #17233b; border-radius: .75rem; background: #17233b; color: #fff; font: inherit; cursor: pointer; }
+      :focus-visible { outline: 3px solid #3468c0; outline-offset: 4px; }
+      #quiz-result { margin-top: 1.5rem; padding: 1rem; background: #f5f7fb; border-radius: .75rem; }
+      #quiz-result h3 { margin: 0; }
+      #quiz-result button { margin-top: 1rem; }
     </style>
   </head>
   <body>
     <main>
       <h1>Hello, world!</h1>
       <p>A little hello. A world of possibilities.</p>
+      <section class="quiz" aria-labelledby="quiz-heading">
+        <h2 id="quiz-heading">Get to Know Me</h2>
+        <p>A little hello starts with a conversation. Pick what feels like you to find your conversation style and a question we could start with.</p>
+        <p>Your answers stay on this page. They aren’t sent or saved.</p>
+        <noscript><p>Turn on JavaScript to take the quiz and see your result.</p></noscript>
+        <form id="quiz-form" hidden>
+          <fieldset>
+            <legend>1. What sounds like a good afternoon?</legend>
+            <label><input type="radio" name="weekend" value="explorer" required />Explore somewhere new</label>
+            <label><input type="radio" name="weekend" value="maker" required />Make something of my own</label>
+            <label><input type="radio" name="weekend" value="connector" required />Catch up with a friend</label>
+          </fieldset>
+          <fieldset>
+            <legend>2. What draws you into a conversation?</legend>
+            <label><input type="radio" name="curiosity" value="explorer" required />An unexpected idea</label>
+            <label><input type="radio" name="curiosity" value="maker" required />How something works</label>
+            <label><input type="radio" name="curiosity" value="connector" required />Someone’s story</label>
+          </fieldset>
+          <fieldset>
+            <legend>3. How would you start something new?</legend>
+            <label><input type="radio" name="project" value="explorer" required />Try a different path</label>
+            <label><input type="radio" name="project" value="maker" required />Build a small first version</label>
+            <label><input type="radio" name="project" value="connector" required />Bring people together</label>
+          </fieldset>
+          <button type="submit">Show my result</button>
+        </form>
+        <div id="quiz-result" role="status" aria-live="polite" aria-atomic="true" hidden>
+          <h3 id="result-heading" tabindex="-1"></h3>
+          <p id="result-description"></p>
+          <button id="quiz-restart" type="button">Take the quiz again</button>
+        </div>
+      </section>
     </main>
+    <script>
+      const form = document.getElementById('quiz-form');
+      const result = document.getElementById('quiz-result');
+      const heading = document.getElementById('result-heading');
+      const description = document.getElementById('result-description');
+      const profiles = {
+        explorer: ['The curious explorer', 'You’re drawn to new ideas and experiences. Let’s start with: what would you love to try for the first time?'],
+        maker: ['The thoughtful maker', 'You like turning ideas into something real. Let’s start with: what would you enjoy creating?'],
+        connector: ['The warm connector', 'You find inspiration in people and their stories. Let’s start with: who has taught you something memorable?'],
+        balanced: ['A little of everything', 'Your choices mix curiosity, creativity and connection. Let’s start with: what has inspired you lately?'],
+      };
+      form.hidden = false;
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        const answers = new FormData(form);
+        const scores = { explorer: 0, maker: 0, connector: 0 };
+        for (const name of ['weekend', 'curiosity', 'project']) {
+          const answer = answers.get(name);
+          if (!Object.hasOwn(scores, answer)) return;
+          scores[answer] += 1;
+        }
+        const winner = Object.keys(scores).find((key) => scores[key] >= 2) || 'balanced';
+        [heading.textContent, description.textContent] = profiles[winner];
+        result.hidden = false;
+        heading.focus();
+      });
+      document.getElementById('quiz-restart').addEventListener('click', () => {
+        form.reset();
+        result.hidden = true;
+        heading.textContent = '';
+        description.textContent = '';
+        form.querySelector('input').focus();
+      });
+    </script>
   </body>
 </html>
