@@ -32,6 +32,10 @@ about the site owner's biography or a visitor's psychological traits.
 
 ## Validation and handoff
 
+See [QA evidence and workflow handoff](issue-14-qa.md) for the executed checks
+and direct GitHub observations. Local validation does not establish Project
+assignment or independent QA approval.
+
 Run `npm test` (which includes `npm run build`) from the repository root.
 The automated suite covers script behavior and HTML structure; it does not
 replace browser checks for layout, native keyboard interaction, or screen-reader
