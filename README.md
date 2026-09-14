@@ -6,6 +6,9 @@ A minimal responsive homepage that displays “Hello, world!”. No dependencies
 
 Requires Node.js 22.18 or newer and npm.
 
+The [Issue #14 requirements and verification map](docs/issue-14-requirements.md)
+records the supplied quiz scope, implementation choices, and pending QA checks.
+
 - `npm start` starts the site at http://localhost:3000. Set `PORT` to change the port.
 - `npm run build` copies the self-contained homepage into `dist/` for static hosting.
 - `npm test` builds the site and runs the HTTP and build validation tests.
