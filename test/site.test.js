@@ -18,13 +18,15 @@ after(async () => {
   await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
 });
 
-test('serves the homepage with the greeting and mobile viewport', async () => {
+test('serves the homepage with the original title, greeting, tagline and mobile viewport', async () => {
   for (const path of ['/', '/index.html', '/?welcome=true']) {
     const response = await fetch(`${baseURL}${path}`);
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('content-type'), 'text/html; charset=utf-8');
     const html = await response.text();
+    assert.match(html, /<title>Hello, world!<\/title>/);
     assert.match(html, /<h1>Hello, world!<\/h1>/);
+    assert.match(html, /<p>A little hello\. A world of possibilities\.<\/p>/);
     assert.match(html, /name="viewport" content="width=device-width, initial-scale=1"/);
   }
 });

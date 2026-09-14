@@ -9,6 +9,10 @@
   "scripts": {
     "start": "node scripts/server.js",
     "build": "node scripts/build.js",
-    "test": "npm run build && node --test"
+    "test": "npm run build && node --test",
+    "test:browser": "node scripts/browser-check.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
   }
 }
