@@ -50,6 +50,21 @@
         background: radial-gradient(circle at 30% 25%, #dbeafe, #93b4e8 65%, #789bd2);
         animation: bounce 12s ease-in-out infinite alternate;
       }
+      .ball-pink {
+        --size: clamp(4rem, 14vw, 9rem);
+        left: 38%;
+        background: radial-gradient(circle at 30% 25%, #fce7f3, #f0a3ca 65%, #ce7ba5);
+      }
+      .ball-green {
+        --size: clamp(3.5rem, 12vw, 8rem);
+        left: 63%;
+        background: radial-gradient(circle at 30% 25%, #dcfce7, #86d5a3 65%, #5aae7a);
+      }
+      .ball-amber {
+        --size: clamp(3rem, 10vw, 7rem);
+        left: 84%;
+        background: radial-gradient(circle at 30% 25%, #fef3c7, #f4cd75 65%, #d7a744);
+      }
       @keyframes bounce {
         from { transform: translateY(0); }
         to { transform: translateY(calc(100svh - var(--size))); }
@@ -60,7 +75,12 @@
     </style>
   </head>
   <body>
-    <div class="ball-background" aria-hidden="true"><div class="ball"></div></div>
+    <div class="ball-background" aria-hidden="true">
+      <div class="ball"></div>
+      <div class="ball ball-pink"></div>
+      <div class="ball ball-green"></div>
+      <div class="ball ball-amber"></div>
+    </div>
     <main>
       <h1>Hello, world!</h1>
       <p>A little hello. A world of possibilities.</p>
