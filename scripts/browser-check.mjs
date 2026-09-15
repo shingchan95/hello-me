@@ -41,6 +41,14 @@ try {
     assert.ok(bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= viewport.width && bounds.y + bounds.height <= viewport.height,
       `greeting must fit in the initial ${viewport.width}px viewport`);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    const links = await page.getByRole('navigation').locator('a').evaluateAll(elements =>
+      elements.map(el => { const r = el.getBoundingClientRect(); return {x: r.x, y: r.y, width: r.width, height: r.height}; }));
+    assert.ok(links.every(r => r.width >= 44 && r.height >= 44), 'navigation provides comfortable touch targets');
+    if (viewport.width === 320) {
+      assert.equal(links[0].y, links[1].y, 'mobile navigation has two columns');
+      assert.equal(links[2].y, links[3].y);
+      assert.ok(links[2].y > links[0].y, 'mobile navigation has two rows');
+    }
   }
   assert.equal(await page.locator('form, fieldset, input, #quiz-result').count(), 0);
   assert.equal(await page.getByText('Get to Know Me').count(), 0);
@@ -77,8 +85,17 @@ try {
     }
     await page.evaluate(() => scrollTo(0, 0));
     const ball = balls.first();
-    await ball.evaluate(el => { el.getAnimations()[0].currentTime = 0; });
+    await ball.evaluate(el => {
+      el.blur();
+      for (const animation of el.getAnimations()) {
+        if (animation.animationName === 'bounce') animation.currentTime = 0;
+        else animation.cancel();
+      }
+    });
     const bounds = await ball.boundingBox();
+    await page.mouse.move(bounds.x + bounds.width / 2, 8);
+    assert.equal(await ball.evaluate(el => getComputedStyle(el).animationPlayState), 'paused',
+      'hover pauses background travel while clicking');
     await page.mouse.click(bounds.x + bounds.width / 2, 8);
     assert.equal(await ball.evaluate(el => el.getAnimations().length), 2, 'pointer click starts extra bounce');
     const offsets = await ball.evaluate(el => {
@@ -92,12 +109,17 @@ try {
     assert.ok(offsets[1] > offsets[0] + 20, 'click visibly moves ball');
     assert.ok(Math.abs(offsets[2] - offsets[0]) < 1, 'click bounce returns to start');
     await ball.focus();
+    await page.mouse.move(0, 0);
     for (const key of ['Enter', 'Space']) {
       await page.keyboard.press(key);
+      assert.equal(await ball.evaluate(el => getComputedStyle(el).animationPlayState), 'paused',
+        'keyboard focus pauses background travel while activating');
       assert.equal(await ball.evaluate(el => el.getAnimations().length), 2, 'keyboard activation restarts bounce');
     }
   }
   await page.emulateMedia({reducedMotion: 'reduce'});
+  await page.waitForFunction(() => [...document.querySelectorAll('.ball')]
+    .every(el => el.getAnimations().length === 0));
   for (const ball of await balls.all()) {
     assert.equal(await ball.evaluate(el => el.getAnimations().length), 0, 'reduced motion disables every ball animation');
   }

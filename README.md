@@ -16,7 +16,7 @@ On Alpine Linux, install the system `chromium` package and run
 Playwright's browser. Screen-reader announcements and visual appearance still
 need human QA.
 
-The page uses system fonts and has no external assets and a small inline script for click interactions. Navigation links lead to fictional Home, About, Projects, and Contact sections and wrap on small screens. Four keyboard-accessible balls in blue, pink, green, and amber bounce slowly behind the greeting, taking 12 seconds in each direction. Click a ball (or press Enter or Space when focused) for an extra bounce. The animation is disabled when the visitor prefers reduced motion. The questionnaire has been removed.
+The page uses system fonts and has no external assets and a small inline script for click interactions. Navigation links lead to fictional Home, About, Projects, and Contact sections and use two columns on small screens. Four keyboard-accessible balls in blue, pink, green, and amber bounce slowly behind the greeting, taking 12 seconds in each direction. Hovering or focusing a ball pauses its background travel to make activation easier. Click a ball (or press Enter or Space when focused) for an extra bounce. The animation is disabled when the visitor prefers reduced motion. The questionnaire has been removed.
 
 ## Deployment verification
 

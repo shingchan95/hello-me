@@ -25,6 +25,10 @@
       nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; padding: .5rem; border-radius: 1rem; background: #fff; }
       nav a { padding: .75rem 1rem; color: #17233b; text-decoration: none; border-radius: .5rem; }
       nav a:hover { background: #e8eef9; }
+      @media (max-width: 30rem) {
+        nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        nav a { text-align: center; }
+      }
       :focus-visible { outline: 3px solid #315fa8; outline-offset: 4px; }
       section { padding: 2rem 0; scroll-margin-top: 1rem; }
       section + section { border-top: 1px solid #dce3ef; }
@@ -63,6 +67,8 @@
         background: radial-gradient(circle at 30% 25%, #dbeafe, #93b4e8 65%, #789bd2);
         animation: bounce 12s ease-in-out infinite alternate;
       }
+      .ball:hover, .ball:focus-visible { animation-play-state: paused; }
+      .ball:active { filter: brightness(.9); }
       .ball-pink {
         --size: clamp(4rem, 14vw, 9rem);
         left: 38%;
