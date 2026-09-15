@@ -134,9 +134,13 @@
         ball.addEventListener("click", () => {
           clickBounce?.cancel();
           if (reducedMotion.matches) return;
-          const direction = ball.getBoundingClientRect().top < 80 ? 1 : -1;
+          const bounds = ball.getBoundingClientRect();
+          const spaceAbove = Math.max(0, bounds.top);
+          const spaceBelow = Math.max(0, document.documentElement.clientHeight - bounds.bottom);
+          const direction = spaceBelow >= spaceAbove ? 1 : -1;
+          const distance = Math.min(64, Math.max(spaceAbove, spaceBelow));
           clickBounce = ball.animate(
-            [0, 64, 0, 28, 0, 10, 0].map(distance => ({ translate: "0 " + direction * distance + "px" })),
+            [0, 1, 0, 28 / 64, 0, 10 / 64, 0].map(step => ({ translate: "0 " + direction * distance * step + "px" })),
             { duration: 700, easing: "ease-out" }
           );
         });

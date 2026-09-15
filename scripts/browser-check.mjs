@@ -117,6 +117,41 @@ try {
       assert.equal(await ball.evaluate(el => el.getAnimations().length), 2, 'keyboard activation restarts bounce');
     }
   }
+  // A short landscape viewport leaves less than 64px around the largest ball.
+  // Check every rebound, including repeated activation, at both edges and midway.
+  await page.setViewportSize({width: 1440, height: 240});
+  for (const ball of await balls.all()) {
+    for (const travelTime of [0, 6000, 12000]) {
+      const positions = await ball.evaluate((el, time) => {
+        for (const animation of el.getAnimations()) {
+          if (animation.animationName === 'bounce') {
+            animation.pause();
+            animation.currentTime = time;
+          } else animation.cancel();
+        }
+        const start = el.getBoundingClientRect().top;
+        el.click();
+        el.click();
+        const animations = el.getAnimations().filter(animation => animation.animationName !== 'bounce');
+        const animation = animations[0];
+        animation.pause();
+        const frames = Array.from({length: 43}, (_, index) => {
+          animation.currentTime = index * 700 / 42;
+          const bounds = el.getBoundingClientRect();
+          return {top: bounds.top, bottom: bounds.bottom};
+        });
+        return {start, count: animations.length, frames};
+      }, travelTime);
+      assert.equal(positions.count, 1, 'repeated activation replaces the previous click bounce');
+      assert.ok(positions.frames.every(bounds => bounds.top >= -1 && bounds.bottom <= 241),
+        'every click rebound stays inside a short viewport');
+      assert.ok(positions.frames.some(bounds => Math.abs(bounds.top - positions.start) > 10),
+        'bounce remains visible with limited vertical space');
+      assert.ok(Math.abs(positions.frames.at(-1).top - positions.start) < 1,
+        'bounded bounce returns to its starting position');
+    }
+  }
+  console.log('PASS: repeated click bounces stay visible and within a short landscape viewport.');
   await page.emulateMedia({reducedMotion: 'reduce'});
   await page.waitForFunction(() => [...document.querySelectorAll('.ball')]
     .every(el => el.getAnimations().length === 0));
