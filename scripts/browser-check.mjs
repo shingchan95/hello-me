@@ -36,6 +36,10 @@ try {
   assert.equal(await page.locator('.ball-background').getAttribute('aria-hidden'), 'true');
   assert.equal(await page.locator('.ball-background').evaluate(el => getComputedStyle(el).pointerEvents), 'none');
   const ball = page.locator('.ball');
+  assert.deepEqual(await ball.evaluate(el => {
+    const style = getComputedStyle(el);
+    return [style.animationDuration, style.animationIterationCount, style.animationDirection];
+  }), ['12s', 'infinite', 'alternate'], 'implemented background keeps its slow, continuous bounce');
   for (const viewport of [{width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
     await page.setViewportSize(viewport);
     const positions = await ball.evaluate(el => {

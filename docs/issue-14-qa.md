@@ -1,4 +1,19 @@
-# Issue #14 / PR #15 verification
+# Issue #14 / PR #15 verification (historical)
+
+## Superseded by questionnaire removal
+
+The quiz described below was removed by commit `401b8d0` and the replacement
+was included in `7653e52` (PR #22). The current homepage contains the greeting
+and slow bouncing ball, with no quiz. The previous quiz acceptance blocker is
+no longer a current implementation requirement; its “needs attention” handoff
+is superseded by that removal.
+
+All observations and pending-work instructions below are historical and apply
+only to Issue #14's former quiz scope. They must not be used to report the
+current homepage as still being implemented or blocked on quiz QA.
+See the [current repository status](../README.md#current-work-status).
+This correction does not change external task, worker, or GitHub issue status;
+those records are maintained outside this site.
 
 ## Follow-up repair — 2026-09-14 19:55 UTC
 
@@ -28,7 +43,7 @@ Revalidated the preserved implementation: `npm test` passed the build and all
 `git diff --check` passed after the documentation correction. Application code
 and CI permissions are unchanged. No external workflow transitions were made.
 
-## Current disposition — 2026-09-14 19:52 UTC
+## Historical disposition — 2026-09-14 19:52 UTC
 
 **Acceptance remains blocked on trusted Project verification.** Passing repository
 checks does not establish work-item completion. This section supersedes workflow

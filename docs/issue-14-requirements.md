@@ -1,4 +1,13 @@
-# Issue #14: Get to Know Me quiz
+# Issue #14: Get to Know Me quiz (historical)
+
+## Superseded scope
+
+The questionnaire was removed by commit `401b8d0`, included in `7653e52`
+(PR #22), and replaced with a slow bouncing ball background. This document
+preserves the former quiz requirements and implementation map for reference.
+References below to quiz markup, `test/quiz.test.js`, and pending quiz approval
+are historical; they do not describe the current checkout or its remaining work.
+See the [current repository status](../README.md#current-work-status).
 
 ## Requirements source
 
