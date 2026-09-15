@@ -32,18 +32,21 @@ try {
   assert.equal(await page.locator('.ball-background').getAttribute('aria-hidden'), 'true');
   assert.equal(await page.locator('.ball-background').evaluate(el => getComputedStyle(el).pointerEvents), 'none');
   const ball = page.locator('.ball');
-  const positions = await ball.evaluate(el => {
-    const animation = el.getAnimations()[0];
-    animation.pause();
-    return [0, 6000, 12000, 18000, 24000].map(time => {
-      animation.currentTime = time;
-      const rect = el.getBoundingClientRect();
-      return {top: rect.top, bottom: rect.bottom};
+  for (const viewport of [{width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
+    await page.setViewportSize(viewport);
+    const positions = await ball.evaluate(el => {
+      const animation = el.getAnimations()[0];
+      animation.pause();
+      return [0, 6000, 12000, 18000, 24000].map(time => {
+        animation.currentTime = time;
+        const rect = el.getBoundingClientRect();
+        return {top: rect.top, bottom: rect.bottom};
+      });
     });
-  });
-  assert.ok(positions[0].top < positions[1].top && positions[1].top < positions[2].top, 'ball descends over twelve seconds');
-  assert.ok(positions[2].top > positions[3].top && positions[3].top > positions[4].top, 'ball bounces back up');
-  assert.ok(positions.every(p => p.top >= 0 && p.bottom <= 900), 'ball stays in viewport');
+    assert.ok(positions[0].top < positions[1].top && positions[1].top < positions[2].top, 'ball descends over twelve seconds');
+    assert.ok(positions[2].top > positions[3].top && positions[3].top > positions[4].top, 'ball bounces back up');
+    assert.ok(positions.every(p => p.top >= 0 && p.bottom <= viewport.height), `ball stays in the ${viewport.width}px viewport`);
+  }
   await page.emulateMedia({reducedMotion: 'reduce'});
   assert.equal(await ball.evaluate(el => el.getAnimations().length), 0, 'reduced motion disables animation');
   assert.equal(requests.length, 1, 'page must not make network requests');
