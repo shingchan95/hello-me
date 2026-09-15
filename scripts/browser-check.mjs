@@ -21,6 +21,17 @@ try {
   assert.equal(await response.text(), await readFile(new URL('../index.html', import.meta.url), 'utf8'),
     'served homepage must match this checkout, including when checking deployment');
   assert.equal(await page.title(), 'Hello, world!');
+  // Keep the reviewed fictional copy explicit so personal details cannot be
+  // introduced silently, even when the served HTML matches the checkout.
+  assert.deepEqual(await page.locator('main p').allTextContents(), [
+    'A little hello. A world of possibilities.',
+    'Explore this fictional template, or click a background ball to give it a bounce.',
+    'A placeholder for an imaginary creator with a love of playful ideas. This is a fictional template, with no personal biography.',
+    'Imagine a moon garden, a cloud library, or a tiny city of paper. These sample projects are fictional placeholders.',
+    'A space for future contact options. This template does not include real contact details or collect messages.',
+  ], 'template copy must match the reviewed fictional placeholders');
+  assert.deepEqual(await page.locator('a').evaluateAll(links => links.map(link => link.getAttribute('href'))),
+    ['#home', '#about', '#projects', '#contact'], 'template links must remain local placeholders');
   for (const viewport of [{width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
     await page.setViewportSize(viewport);
     const greeting = page.getByRole('heading', {name: 'Hello, world!', level: 1, exact: true});
@@ -106,7 +117,7 @@ try {
   await noJS.getByRole('link', {name: 'About', exact: true}).click();
   assert.equal(new URL(noJS.url()).hash, '#about');
   assert.equal(await noJS.locator('form').count(), 0);
-  console.log('PASS: click and keyboard bounce, responsive section navigation, HTTP, responsive greeting, questionnaire removal, four distinct ball colors, slow bounce and reversal for every ball, reduced motion, no browser errors or external requests/storage, and JavaScript-disabled rendering.');
+  console.log('PASS: fictional placeholder copy and links, click and keyboard bounce, responsive section navigation, HTTP, responsive greeting, questionnaire removal, four distinct ball colors, slow bounce and reversal for every ball, reduced motion, no browser errors or external requests/storage, and JavaScript-disabled rendering.');
   console.log(`Verified homepage matches this checkout: ${siteURL}`);
 } finally {
   await browser?.close();
