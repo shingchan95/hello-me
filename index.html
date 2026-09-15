@@ -14,13 +14,22 @@
         margin: 0;
         min-height: 100vh;
         min-height: 100svh;
-        display: grid;
-        place-items: center;
+
         padding: 1.5rem;
         background: #f5f7fb;
         color: #17233b;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
+      header, main { position: relative; width: 100%; max-width: 44rem; margin: 0 auto; }
+      header { margin-bottom: 1.5rem; }
+      nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; padding: .5rem; border-radius: 1rem; background: #fff; }
+      nav a { padding: .75rem 1rem; color: #17233b; text-decoration: none; border-radius: .5rem; }
+      nav a:hover { background: #e8eef9; }
+      :focus-visible { outline: 3px solid #315fa8; outline-offset: 4px; }
+      section { padding: 2rem 0; scroll-margin-top: 1rem; }
+      section + section { border-top: 1px solid #dce3ef; }
+      section:target { background: #f5f7fb; border-radius: .5rem; }
+      h2 { margin: 0; }
       main {
         width: 100%;
         max-width: 44rem;
@@ -46,6 +55,10 @@
         left: 12%;
         width: var(--size);
         height: var(--size);
+        border: 0;
+        padding: 0;
+        pointer-events: auto;
+        cursor: pointer;
         border-radius: 50%;
         background: radial-gradient(circle at 30% 25%, #dbeafe, #93b4e8 65%, #789bd2);
         animation: bounce 12s ease-in-out infinite alternate;
@@ -75,15 +88,54 @@
     </style>
   </head>
   <body>
-    <div class="ball-background" aria-hidden="true">
-      <div class="ball"></div>
-      <div class="ball ball-pink"></div>
-      <div class="ball ball-green"></div>
-      <div class="ball ball-amber"></div>
+    <div class="ball-background" role="group" aria-label="Interactive background">
+      <button type="button" class="ball" aria-label="Bounce blue ball"></button>
+      <button type="button" class="ball ball-pink" aria-label="Bounce pink ball"></button>
+      <button type="button" class="ball ball-green" aria-label="Bounce green ball"></button>
+      <button type="button" class="ball ball-amber" aria-label="Bounce amber ball"></button>
     </div>
+    <header>
+      <nav aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
     <main>
+      <section id="home" aria-label="Home">
       <h1>Hello, world!</h1>
       <p>A little hello. A world of possibilities.</p>
+      <p>Explore this fictional template, or click a background ball to give it a bounce.</p>
+      </section>
+      <section id="about" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <p>A placeholder for an imaginary creator with a love of playful ideas. This is a fictional template, with no personal biography.</p>
+      </section>
+      <section id="projects" aria-labelledby="projects-title">
+        <h2 id="projects-title">Projects</h2>
+        <p>Imagine a moon garden, a cloud library, or a tiny city of paper. These sample projects are fictional placeholders.</p>
+      </section>
+      <section id="contact" aria-labelledby="contact-title">
+        <h2 id="contact-title">Contact</h2>
+        <p>A space for future contact options. This template does not include real contact details or collect messages.</p>
+      </section>
     </main>
+    <script>
+      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
+      document.querySelectorAll(".ball").forEach(ball => {
+        let clickBounce;
+        ball.addEventListener("click", () => {
+          clickBounce?.cancel();
+          if (reducedMotion.matches) return;
+          const direction = ball.getBoundingClientRect().top < 80 ? 1 : -1;
+          clickBounce = ball.animate(
+            [0, 64, 0, 28, 0, 10, 0].map(distance => ({ translate: "0 " + direction * distance + "px" })),
+            { duration: 700, easing: "ease-out" }
+          );
+        });
+        reducedMotion.addEventListener("change", () => clickBounce?.cancel());
+      });
+    </script>
   </body>
 </html>
