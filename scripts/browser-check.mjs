@@ -107,6 +107,55 @@ try {
   assert.equal(requests.length, 1, 'page must not make network requests');
   assert.deepEqual(errors, [], 'page must not produce browser errors');
   assert.deepEqual(await page.evaluate(() => [localStorage.length, sessionStorage.length, document.cookie]), [0, 0, '']);
+  // Exercise touch input as well as a narrow desktop viewport. Use a fresh
+  // context to test reduced motion both at page load and after a preference change.
+  const mobile = await browser.newPage({
+    viewport: {width: 320, height: 640}, isMobile: true, hasTouch: true,
+    reducedMotion: 'reduce',
+  });
+  await mobile.goto(siteURL);
+  assert.equal(await mobile.locator('.ball').evaluateAll(elements =>
+    elements.every(el => el.getAnimations().length === 0)), true,
+  'initial reduced-motion preference disables every animation');
+  const amber = mobile.getByRole('button', {name: 'Bounce amber ball', exact: true});
+  const amberBounds = await amber.boundingBox();
+  // The card covers the center; tap the exposed right edge of the circle.
+  await amber.tap({position: {x: amberBounds.width - 4, y: amberBounds.height / 2}});
+  assert.equal(await mobile.locator('.ball').evaluateAll(elements =>
+    elements.every(el => el.getAnimations().length === 0)), true,
+  'touch activation respects reduced motion');
+  for (const name of ['About', 'Projects', 'Contact', 'Home']) {
+    await mobile.getByRole('link', {name, exact: true}).tap();
+    assert.equal(new URL(mobile.url()).hash, '#' + name.toLowerCase());
+    const bounds = await mobile.locator('#' + name.toLowerCase()).boundingBox();
+    assert.ok(bounds.y < 640 && bounds.y + bounds.height > 0,
+      `touch navigation brings ${name} into view`);
+    assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  }
+  await mobile.emulateMedia({reducedMotion: 'no-preference'});
+  await mobile.evaluate(() => scrollTo(0, 0));
+  const touchBall = mobile.locator('.ball').first();
+  await touchBall.evaluate(el => {
+    const animation = el.getAnimations()[0];
+    animation.pause();
+    animation.currentTime = 0;
+  });
+  const touchBounds = await touchBall.boundingBox();
+  await mobile.touchscreen.tap(touchBounds.x + touchBounds.width / 2, 8);
+  const touchPositions = await touchBall.evaluate(el => {
+    const animation = el.getAnimations().find(animation => animation.animationName !== 'bounce');
+    if (!animation) return [];
+    animation.pause();
+    return [0, 115, 700].map(time => {
+      animation.currentTime = time;
+      return el.getBoundingClientRect().top;
+    });
+  });
+  assert.equal(touchPositions.length, 3, 'touch starts an extra bounce');
+  assert.ok(touchPositions[1] > touchPositions[0] + 20, 'touch visibly moves the ball');
+  assert.ok(Math.abs(touchPositions[2] - touchPositions[0]) < 1, 'touch bounce returns to start');
+  await mobile.close();
+  console.log('PASS: 320px mobile touch bounce and all four navigation links; reduced motion on initial load and touch activation.');
   const noJS = await browser.newPage({javaScriptEnabled: false});
   await noJS.goto(siteURL);
   assert.equal(await noJS.getByRole('heading', {name: 'Hello, world!'}).isVisible(), true);

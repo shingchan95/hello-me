@@ -1,5 +1,29 @@
 # Interactive background and template navigation QA
 
+## Follow-up acceptance validation — 2026-09-15
+
+Preserved the implementation and prior QA work in `981d6a7`. Re-ran the
+acceptance-specific Chromium checks and extended them with a 320 × 640 mobile
+context using touch input. No application changes were necessary.
+
+- `npm test`: PASS, all 7 build/HTTP tests, zero failures or skips.
+- `CHROMIUM_PATH=/usr/bin/chromium npm run test:browser`: PASS, including the
+  existing desktop/mobile click displacement, keyboard activation, all four
+  section links, 320/768/1440px overflow checks, and exact fictional-copy checks.
+- New touch checks: PASS, a tap moves the ball over 20px and returns it within
+  1px of its start; all four navigation links bring their sections into view.
+- New initial reduced-motion checks: PASS, all four balls start without
+  animation and a touch activation leaves them still. Restoring normal motion
+  enables touch bounce. Existing live preference-change checks also pass.
+- `git diff --check`: PASS.
+
+Environment: Node.js v24.21.0, npm 11.19.0, system Chromium 152.0.7977.82.
+The first new reduced-motion tap targeted a ball center covered by the nav and
+timed out; the test now taps its exposed edge using normal browser hit testing.
+The completed suite passed against the local HTTP server with an exact HTML
+comparison to this checkout. This is automated Chromium mobile emulation,
+not physical-device, hosted CI, deployment, or human visual review.
+
 ## Repair validation — 2026-09-15
 
 Validated the preserved implementation from `78da368` and the additional
