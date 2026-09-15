@@ -17,3 +17,16 @@ Playwright's browser. Screen-reader announcements and visual appearance still
 need human QA.
 
 The page uses system fonts and has no external assets or runtime JavaScript. A decorative ball bounces slowly behind the greeting, taking 12 seconds in each direction. The animation is disabled when the visitor prefers reduced motion. The questionnaire has been removed.
+
+## Deployment verification
+
+GitHub Pages publishes the repository root from `main` at
+https://shingchan95.github.io/hello-me/. After deployment, run the same browser
+checks against the live site, including an exact comparison with this checkout:
+
+```sh
+SITE_URL=https://shingchan95.github.io/hello-me/ npm run test:browser
+```
+
+On Alpine, also set `CHROMIUM_PATH=/usr/bin/chromium`. A stale deployment fails
+the content comparison even if the page still loads successfully.

@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { createSiteServer } from './server.js';
-const server = createSiteServer();
-await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+const server = process.env.SITE_URL ? null : createSiteServer();
+if (server) await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+const siteURL = process.env.SITE_URL || `http://127.0.0.1:${server.address().port}`;
 let browser;
 try {
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH });
@@ -14,8 +16,10 @@ try {
     if (message.type() === 'error') errors.push(message.text());
   });
   page.on('request', request => requests.push(request.url()));
-  const response = await page.goto(`http://127.0.0.1:${server.address().port}`);
+  const response = await page.goto(siteURL);
   assert.equal(response.status(), 200, 'homepage must load successfully');
+  assert.equal(await response.text(), await readFile(new URL('../index.html', import.meta.url), 'utf8'),
+    'served homepage must match this checkout, including when checking deployment');
   assert.equal(await page.title(), 'Hello, world!');
   for (const viewport of [{width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
     await page.setViewportSize(viewport);
@@ -53,12 +57,13 @@ try {
   assert.deepEqual(errors, [], 'page must not produce browser errors');
   assert.deepEqual(await page.evaluate(() => [localStorage.length, sessionStorage.length, document.cookie]), [0, 0, '']);
   const noJS = await browser.newPage({javaScriptEnabled: false});
-  await noJS.goto(`http://127.0.0.1:${server.address().port}`);
+  await noJS.goto(siteURL);
   assert.equal(await noJS.getByRole('heading', {name: 'Hello, world!'}).isVisible(), true);
   assert.equal(await noJS.locator('.ball').isVisible(), true);
   assert.equal(await noJS.locator('form').count(), 0);
   console.log('PASS: HTTP, responsive greeting, questionnaire removal, slow bounce and reversal, reduced motion, no browser errors or external requests/storage, and JavaScript-disabled rendering.');
+  console.log(`Verified homepage matches this checkout: ${siteURL}`);
 } finally {
   await browser?.close();
-  await new Promise(resolve => server.close(resolve));
+  if (server) await new Promise(resolve => server.close(resolve));
 }
