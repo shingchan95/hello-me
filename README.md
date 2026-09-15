@@ -16,7 +16,7 @@ On Alpine Linux, install the system `chromium` package and run
 Playwright's browser. Screen-reader announcements and visual appearance still
 need human QA.
 
-The page uses system fonts and has no external assets or runtime JavaScript. A decorative ball bounces slowly behind the greeting, taking 12 seconds in each direction. The animation is disabled when the visitor prefers reduced motion. The questionnaire has been removed.
+The page uses system fonts and has no external assets or runtime JavaScript. Four decorative balls in blue, pink, green, and amber bounce slowly behind the greeting, taking 12 seconds in each direction. The animation is disabled when the visitor prefers reduced motion. The questionnaire has been removed.
 
 ## Deployment verification
 
