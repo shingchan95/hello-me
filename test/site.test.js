@@ -87,3 +87,9 @@ test('the start entry point launches and serves the homepage', { timeout: 10000 
   assert.match(await response.text(), /<h1>Hello, world!<\/h1>/);
   assert.equal(errors, '');
 });
+
+test('homepage removes questionnaire markup and scripts', async () => {
+  const html = await (await fetch(baseURL)).text();
+  assert.doesNotMatch(html, /<form|<fieldset|<input|<script|quiz|questionnaire/i);
+  assert.match(html, /class="ball-background" aria-hidden="true"/);
+});

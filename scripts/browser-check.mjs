@@ -27,37 +27,34 @@ try {
       `greeting must fit in the initial ${viewport.width}px viewport`);
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   }
-  await page.setViewportSize({width: 320, height: 640});
-  await page.getByRole('button', {name: 'Show my result'}).click();
-  assert.equal(await page.locator('#quiz-result').isVisible(), false);
-  await page.locator('input').first().focus();
-  await page.keyboard.press('ArrowRight');
-  await page.keyboard.press('Tab');
-  await page.keyboard.press('Space');
-  await page.keyboard.press('Tab');
-  await page.keyboard.press('Space');
-  await page.keyboard.press('Tab');
-  await page.keyboard.press('Enter');
-  assert.equal(await page.locator('#result-heading').textContent(), 'The curious explorer');
-  assert.equal(await page.locator('#result-heading').evaluate(el => el === document.activeElement), true);
-  await page.keyboard.press('Tab');
-  await page.keyboard.press('Enter');
-  assert.equal(await page.locator('input:checked').count(), 0);
-  assert.equal(await page.locator('#quiz-result').isVisible(), false);
-  assert.equal(await page.locator('input').first().evaluate(el => el === document.activeElement), true);
-  for (const width of [320, 768, 1440]) {
-    await page.setViewportSize({width, height: 900});
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-  }
-  assert.equal(requests.length, 1, 'quiz must not make network requests');
-  assert.deepEqual(errors, [], 'quiz must not produce browser errors');
+  assert.equal(await page.locator('form, fieldset, input, #quiz-result').count(), 0);
+  assert.equal(await page.getByText('Get to Know Me').count(), 0);
+  assert.equal(await page.locator('.ball-background').getAttribute('aria-hidden'), 'true');
+  assert.equal(await page.locator('.ball-background').evaluate(el => getComputedStyle(el).pointerEvents), 'none');
+  const ball = page.locator('.ball');
+  const positions = await ball.evaluate(el => {
+    const animation = el.getAnimations()[0];
+    animation.pause();
+    return [0, 6000, 12000, 18000, 24000].map(time => {
+      animation.currentTime = time;
+      const rect = el.getBoundingClientRect();
+      return {top: rect.top, bottom: rect.bottom};
+    });
+  });
+  assert.ok(positions[0].top < positions[1].top && positions[1].top < positions[2].top, 'ball descends over twelve seconds');
+  assert.ok(positions[2].top > positions[3].top && positions[3].top > positions[4].top, 'ball bounces back up');
+  assert.ok(positions.every(p => p.top >= 0 && p.bottom <= 900), 'ball stays in viewport');
+  await page.emulateMedia({reducedMotion: 'reduce'});
+  assert.equal(await ball.evaluate(el => el.getAnimations().length), 0, 'reduced motion disables animation');
+  assert.equal(requests.length, 1, 'page must not make network requests');
+  assert.deepEqual(errors, [], 'page must not produce browser errors');
   assert.deepEqual(await page.evaluate(() => [localStorage.length, sessionStorage.length, document.cookie]), [0, 0, '']);
   const noJS = await browser.newPage({javaScriptEnabled: false});
   await noJS.goto(`http://127.0.0.1:${server.address().port}`);
   assert.equal(await noJS.getByRole('heading', {name: 'Hello, world!'}).isVisible(), true);
-  assert.equal(await noJS.locator('noscript').isVisible(), true);
-  assert.equal(await noJS.locator('#quiz-form').isVisible(), false);
-  console.log('PASS: homepage HTTP status, title and greeting in mobile/tablet/desktop viewports, browser keyboard flow, required validation, result focus, restart, 320/768/1440px layout, no runtime/console errors, no answer requests/storage, and no-JavaScript fallback.');
+  assert.equal(await noJS.locator('.ball').isVisible(), true);
+  assert.equal(await noJS.locator('form').count(), 0);
+  console.log('PASS: HTTP, responsive greeting, questionnaire removal, slow bounce and reversal, reduced motion, no browser errors or external requests/storage, and JavaScript-disabled rendering.');
 } finally {
   await browser?.close();
   await new Promise(resolve => server.close(resolve));
