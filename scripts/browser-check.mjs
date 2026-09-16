@@ -50,6 +50,15 @@ try {
       assert.ok(links[2].y > links[0].y, 'mobile navigation has two rows');
     }
   }
+  // Focus fragment destinations without adding sections to the normal Tab order.
+  for (const name of ['About', 'Projects', 'Contact', 'Home']) {
+    await page.getByRole('link', {name, exact: true}).focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(() => document.activeElement.id), name.toLowerCase(),
+      'keyboard navigation focuses the destination section');
+    assert.equal(await page.locator('#' + name.toLowerCase()).getAttribute('tabindex'), '-1');
+  }
+  await page.evaluate(() => scrollTo(0, 0));
   assert.equal(await page.locator('form, fieldset, input, #quiz-result').count(), 0);
   assert.equal(await page.getByText('Get to Know Me').count(), 0);
   assert.equal(await page.getByRole('group', {name: 'Interactive background'}).count(), 1);
@@ -222,6 +231,8 @@ try {
   }
   await noJS.getByRole('link', {name: 'About', exact: true}).click();
   assert.equal(new URL(noJS.url()).hash, '#about');
+  assert.equal(await noJS.locator('#about').evaluate(el => el === document.activeElement), true,
+    'fragment navigation focuses its section even without JavaScript');
   assert.equal(await noJS.locator('form').count(), 0);
   console.log('PASS: fictional placeholder copy and links, click and keyboard bounce, responsive section navigation, HTTP, responsive greeting, questionnaire removal, four distinct ball colors, slow bounce and reversal for every ball, reduced motion, no browser errors or external requests/storage, and JavaScript-disabled rendering.');
   console.log(`Verified homepage matches this checkout: ${siteURL}`);
