@@ -81,7 +81,7 @@
       }
       .ball-amber {
         --size: clamp(3rem, 10vw, 7rem);
-        left: 84%;
+        left: min(84%, calc(100% - var(--size)));
         background: radial-gradient(circle at 30% 25%, #fef3c7, #f4cd75 65%, #d7a744);
       }
       @keyframes bounce {
