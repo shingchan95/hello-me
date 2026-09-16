@@ -32,7 +32,7 @@ try {
   ], 'template copy must match the reviewed fictional placeholders');
   assert.deepEqual(await page.locator('a').evaluateAll(links => links.map(link => link.getAttribute('href'))),
     ['#home', '#about', '#projects', '#contact'], 'template links must remain local placeholders');
-  for (const viewport of [{width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
+  for (const viewport of [{width: 280, height: 640}, {width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
     await page.setViewportSize(viewport);
     const greeting = page.getByRole('heading', {name: 'Hello, world!', level: 1, exact: true});
     assert.equal(await greeting.count(), 1);
@@ -44,7 +44,7 @@ try {
     const links = await page.getByRole('navigation').locator('a').evaluateAll(elements =>
       elements.map(el => { const r = el.getBoundingClientRect(); return {x: r.x, y: r.y, width: r.width, height: r.height}; }));
     assert.ok(links.every(r => r.width >= 44 && r.height >= 44), 'navigation provides comfortable touch targets');
-    if (viewport.width === 320) {
+    if (viewport.width <= 320) {
       assert.equal(links[0].y, links[1].y, 'mobile navigation has two columns');
       assert.equal(links[2].y, links[3].y);
       assert.ok(links[2].y > links[0].y, 'mobile navigation has two rows');
@@ -67,7 +67,7 @@ try {
   assert.equal(await balls.count(), 4, 'four interactive balls must render');
   const colors = await balls.evaluateAll(elements => elements.map(el => getComputedStyle(el).backgroundImage));
   assert.equal(new Set(colors).size, 4, 'each ball must have a different color');
-  for (const viewport of [{width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
+  for (const viewport of [{width: 280, height: 640}, {width: 320, height: 640}, {width: 768, height: 900}, {width: 1440, height: 900}]) {
     await page.setViewportSize(viewport);
     for (const ball of await balls.all()) {
       const positions = await ball.evaluate(el => {
@@ -84,7 +84,7 @@ try {
       assert.ok(positions.every(p => p.top >= 0 && p.bottom <= viewport.height && p.left >= 0 && p.right <= viewport.width), `ball stays in the ${viewport.width}px viewport`);
     }
   }
-  for (const viewport of [{width: 320, height: 640}, {width: 1440, height: 900}]) {
+  for (const viewport of [{width: 280, height: 640}, {width: 320, height: 640}, {width: 1440, height: 900}]) {
     await page.setViewportSize(viewport);
     for (const name of ['About', 'Projects', 'Contact', 'Home']) {
       await page.getByRole('link', {name, exact: true}).click();
