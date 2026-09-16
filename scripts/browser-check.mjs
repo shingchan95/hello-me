@@ -161,6 +161,28 @@ try {
     }
   }
   console.log('PASS: repeated click bounces stay visible and within a short landscape viewport.');
+  await page.setViewportSize({width: 1440, height: 900});
+  const resumedBall = balls.first();
+  await resumedBall.evaluate(el => {
+    el.blur();
+    for (const animation of el.getAnimations()) animation.cancel();
+    // Restart CSS travel after the deterministic position checks above.
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+  });
+  await page.mouse.move(0, 0);
+  await resumedBall.focus();
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => document.querySelector('.ball').getAnimations()
+    .every(animation => animation.animationName === 'bounce'));
+  await resumedBall.evaluate(el => el.blur());
+  const travelStart = await resumedBall.evaluate(el => el.getAnimations()[0].currentTime);
+  await page.waitForFunction(start => {
+    const animation = document.querySelector('.ball').getAnimations()[0];
+    return animation.playState === 'running' && animation.currentTime > start + 100;
+  }, travelStart);
+  console.log('PASS: background travel resumes after the click bounce finishes and focus leaves.');
   await page.emulateMedia({reducedMotion: 'reduce'});
   await page.waitForFunction(() => [...document.querySelectorAll('.ball')]
     .every(el => el.getAnimations().length === 0));
@@ -178,6 +200,11 @@ try {
   const mobile = await browser.newPage({
     viewport: {width: 320, height: 640}, isMobile: true, hasTouch: true,
     reducedMotion: 'reduce',
+  });
+  const mobileErrors = [];
+  mobile.on('pageerror', error => mobileErrors.push(error.message));
+  mobile.on('console', message => {
+    if (message.type() === 'error') mobileErrors.push(message.text());
   });
   await mobile.goto(siteURL);
   assert.equal(await mobile.locator('.ball').evaluateAll(elements =>
@@ -220,6 +247,7 @@ try {
   assert.equal(touchPositions.length, 3, 'touch starts an extra bounce');
   assert.ok(touchPositions[1] > touchPositions[0] + 20, 'touch visibly moves the ball');
   assert.ok(Math.abs(touchPositions[2] - touchPositions[0]) < 1, 'touch bounce returns to start');
+  assert.deepEqual(mobileErrors, [], 'touch interactions must not produce browser errors');
   await mobile.close();
   console.log('PASS: 320px mobile touch bounce and all four navigation links; reduced motion on initial load and touch activation.');
   const noJS = await browser.newPage({javaScriptEnabled: false});

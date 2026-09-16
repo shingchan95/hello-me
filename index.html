@@ -140,8 +140,11 @@
           const direction = spaceBelow >= spaceAbove ? 1 : -1;
           const distance = Math.min(64, Math.max(spaceAbove, spaceBelow));
           clickBounce = ball.animate(
-            [0, 1, 0, 28 / 64, 0, 10 / 64, 0].map(step => ({ translate: "0 " + direction * distance * step + "px" })),
-            { duration: 700, easing: "ease-out" }
+            [0, 1, 0, 28 / 64, 0, 10 / 64, 0].map((step, index) => ({
+              translate: "0 " + direction * distance * step + "px",
+              easing: index % 2 === 0 ? "ease-out" : "ease-in"
+            })),
+            { duration: 700 }
           );
         });
         reducedMotion.addEventListener("change", () => clickBounce?.cancel());
