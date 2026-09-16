@@ -50,6 +50,20 @@ try {
       assert.ok(links[2].y > links[0].y, 'mobile navigation has two rows');
     }
   }
+  // Each fragment must resolve to one named region with a visible heading.
+  for (const [id, label] of [
+    ['home', 'Home'],
+    ['about', 'About — fictional creator'],
+    ['projects', 'Projects — imaginary examples'],
+    ['contact', 'Contact — placeholder'],
+  ]) {
+    const section = page.getByRole('region', {name: label, exact: true});
+    assert.equal(await section.count(), 1, `${id} must have a unique accessible label`);
+    assert.equal(await section.getAttribute('id'), id);
+    assert.equal(await section.getByRole('heading').isVisible(), true);
+    assert.equal(await page.locator(`[id="${id}"]`).count(), 1,
+      'fragment destinations must be unique');
+  }
   // Focus fragment destinations without adding sections to the normal Tab order.
   for (const name of ['About', 'Projects', 'Contact', 'Home']) {
     await page.getByRole('link', {name, exact: true}).focus();
