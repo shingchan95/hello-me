@@ -62,6 +62,7 @@ test('served and built homepages preserve the exact approved footer', async () =
     const footers = [...html.matchAll(/<footer\b[^>]*>([\s\S]*?)<\/footer>/g)];
     assert.equal(footers.length, 1, 'homepage must contain one footer');
     assert.equal(footers[0][1], '<p>Autonomous delivery test B</p>');
+    assert.ok(!html.includes('Autonomous delivery test A'), 'replaced marker must be absent');
   }
 });
 
