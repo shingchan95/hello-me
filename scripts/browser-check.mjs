@@ -38,7 +38,7 @@ try {
     assert.equal(await greeting.count(), 1);
     assert.equal(await greeting.isVisible(), true);
     const footer = page.getByRole('contentinfo');
-    assert.equal(await footer.innerText(), 'Autonomous delivery test A');
+    assert.equal(await footer.innerText(), 'Autonomous delivery test B');
     assert.equal(await footer.isVisible(), true, 'approved footer must be visible at every viewport');
     const bounds = await greeting.boundingBox();
     assert.ok(bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= viewport.width && bounds.y + bounds.height <= viewport.height,
@@ -296,7 +296,7 @@ try {
   await noJS.goto(siteURL);
   assert.equal(await noJS.getByRole('heading', {name: 'Hello, world!'}).isVisible(), true);
   assert.equal(await noJS.locator('.ball').count(), 4);
-  assert.equal(await noJS.getByRole('contentinfo').innerText(), 'Autonomous delivery test A');
+  assert.equal(await noJS.getByRole('contentinfo').innerText(), 'Autonomous delivery test B');
   assert.equal(await noJS.getByRole('contentinfo').isVisible(), true);
   for (const ball of await noJS.locator('.ball').all()) {
     assert.equal(await ball.isVisible(), true);
