@@ -51,6 +51,7 @@
         overflow-wrap: anywhere;
       }
       p { margin: 1rem 0 0; color: #52617a; line-height: 1.6; }
+      footer { margin: 1.5rem auto 0; text-align: center; font-size: .875rem; }
       .ball-background { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: -1; }
       .ball {
         --size: clamp(5rem, 18vw, 12rem);
@@ -127,6 +128,7 @@
         <p>A space for future contact options. This template does not include real contact details or collect messages.</p>
       </section>
     </main>
+    <footer><p>Autonomous delivery test A</p></footer>
     <script>
       const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
       document.querySelectorAll(".ball").forEach(ball => {
