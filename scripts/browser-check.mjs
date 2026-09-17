@@ -52,7 +52,15 @@ try {
       assert.equal(links[2].y, links[3].y);
       assert.ok(links[2].y > links[0].y, 'mobile navigation has two rows');
     }
+    await footer.scrollIntoViewIfNeeded();
+    const footerBounds = await footer.boundingBox();
+    assert.ok(footerBounds.x >= 0 && footerBounds.y >= 0 &&
+      footerBounds.x + footerBounds.width <= viewport.width &&
+      footerBounds.y + footerBounds.height <= viewport.height,
+    `approved footer must fit fully in the ${viewport.width}px viewport after scrolling`);
+    await page.evaluate(() => scrollTo(0, 0));
   }
+  console.log('PASS: exact approved footer text is visible and reachable at every responsive viewport.');
   // Each fragment must resolve to one named region with a visible heading.
   for (const [id, label] of [
     ['home', 'Home'],
