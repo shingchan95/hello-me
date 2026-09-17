@@ -55,6 +55,16 @@ test('build produces the complete homepage for static hosting', async () => {
   assert.equal(built, source);
 });
 
+test('served and built homepages preserve the exact approved footer', async () => {
+  const served = await (await fetch(baseURL)).text();
+  const built = await readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
+  for (const html of [served, built]) {
+    const footers = [...html.matchAll(/<footer\b[^>]*>([\s\S]*?)<\/footer>/g)];
+    assert.equal(footers.length, 1, 'homepage must contain one footer');
+    assert.equal(footers[0][1], '<p>Autonomous delivery test A</p>');
+  }
+});
+
 test('the start entry point launches and serves the homepage', { timeout: 10000 }, async (t) => {
   const child = spawn(process.execPath, ['scripts/server.js'], {
     cwd: new URL('../', import.meta.url),
