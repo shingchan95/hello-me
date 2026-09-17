@@ -188,6 +188,23 @@ try {
   await page.mouse.move(0, 0);
   await resumedBall.focus();
   await page.keyboard.press('Enter');
+  await resumedBall.evaluate(el => el.blur());
+  const pausedTravel = await resumedBall.evaluate(el => {
+    const travel = el.getAnimations().find(animation => animation.animationName === 'bounce');
+    const rebound = el.getAnimations().find(animation => animation.animationName !== 'bounce');
+    rebound.pause();
+    return {state: travel.playState, time: travel.currentTime};
+  });
+  assert.equal(pausedTravel.state, 'paused', 'background travel stays paused when focus leaves during a click bounce');
+  await resumedBall.evaluate(el => {
+    const rebound = el.getAnimations().find(animation => animation.animationName !== 'bounce');
+    rebound.currentTime = 350;
+  });
+  assert.equal(await resumedBall.evaluate(el => el.getAnimations()
+    .find(animation => animation.animationName === 'bounce').currentTime), pausedTravel.time,
+  'background travel must not drift during the rebound');
+  await resumedBall.evaluate(el => el.getAnimations()
+    .find(animation => animation.animationName !== 'bounce').finish());
   await page.waitForFunction(() => document.querySelector('.ball').getAnimations()
     .every(animation => animation.animationName === 'bounce'));
   await resumedBall.evaluate(el => el.blur());
